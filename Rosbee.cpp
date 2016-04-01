@@ -50,9 +50,9 @@ int main(){
   int qBaud = 115200;
   
   //Pin connected to the photointerrupter of the encoder on the left motor.
-  int ePin1 = 1;
+  int leftWheel = 0;
   //Pin connected to the photointerrupter of the encoder on the right motor.
-  int ePin2 = 3;
+  int rightWheel = 3;
   
   //Uart object for communication.
   Uart uart;
@@ -69,9 +69,13 @@ int main(){
   qik.setMotorSpeed(Qik::Motor::M1,0);
   
   //Encoder object for the left motor.
-  Encoder enc1{ePin1};
+  int side = 0;
+  Encoder enc0{leftWheel, side};
+  print("after encoder init \n");
   //Encoder object fot the right motor.
-  Encoder enc2{ePin2};
+  side = 1;
+  Encoder enc1{rightWheel, side};
+
   
   //Variables used for communcation.
   //cmd = command byte received.
@@ -89,26 +93,26 @@ int main(){
    *  TEST CODE
    *
    */
-  if (false) {
+  if (1) {
   // Sleep 5 seconds before starting test
   pause(5000);
   
   // Using the encoder count of one specific Rosbee, might be different for others
-  int totalCounts360WheelTurn = 755; // In encoder counts
+  int totalCounts360WheelTurn = 3300; // In encoder counts
   int wheelCircumference = 386; // In mm
   
   // Keep track of amount of encoder ticks
-  int startEncoderCountEnc1 = enc1.getEncoderCount();
-  int startEncoderCountEnc2 = enc2.getEncoderCount();
+  int startEncoderCountenc0 = enc0.getEncoderCount();
+  int startEncoderCountenc1 = enc1.getEncoderCount();
+  int enc0Count = 0;
   int enc1Count = 0;
-  int enc2Count = 0;
   int encoderCount = 0;
   
   // Motor power
   int motorPower = 30;
   
   // 3m forward
-  int distanceToGo = 3000; // In mm
+  int distanceToGo = 386; // In mm
   
   // Target encoder count
   float encoderCountTarget = totalCounts360WheelTurn * ((float)distanceToGo / wheelCircumference);
@@ -119,16 +123,18 @@ int main(){
   
   // While robot hasn't reached the distanceToGo
   while(encoderCount < encoderCountTarget) {
-    int encoderCountEnc1 = enc1.getEncoderCount() - startEncoderCountEnc1;
-    int encoderCountEnc2 = enc2.getEncoderCount() - startEncoderCountEnc2;
-    encoderCount = (encoderCountEnc1 + encoderCountEnc2) / 2; 
+    int encoderCountenc0 = enc0.getEncoderCount() - startEncoderCountenc0;
+    int encoderCountenc1 = enc1.getEncoderCount() - startEncoderCountenc1;
+    encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;
+    print("enc1: %d and enc2: %d\n",  encoderCountenc0, encoderCountenc1);
+    pause(100);
   } 
   
   // Turn both left and right motors off
   qik.setMotorSpeed(Qik::Motor::M0, 0);
   qik.setMotorSpeed(Qik::Motor::M1, 0);
   
-  pause(20000);
+  /*pause(20000);
   
   
   
@@ -136,8 +142,8 @@ int main(){
   //pause(20000);
   
   // Reset the start encoder count
-  startEncoderCountEnc1 = enc1.getEncoderCount();
-  startEncoderCountEnc2 = enc2.getEncoderCount();
+  startEncoderCountenc0 = enc0.getEncoderCount();
+  startEncoderCountenc1 = enc1.getEncoderCount();
   encoderCount = 0;
   
   // Distance for one circle of Rosbee
@@ -152,14 +158,14 @@ int main(){
      
   // While robot hasn't reached the distanceToGo   
   while(encoderCount < encoderCountTarget) {
-    int encoderCountEnc1 = enc1.getEncoderCount() - startEncoderCountEnc1;
-    int encoderCountEnc2 = enc2.getEncoderCount() - startEncoderCountEnc2;
-    encoderCount = (encoderCountEnc1 + encoderCountEnc2) / 2;            
+    int encoderCountenc0 = enc0.getEncoderCount() - startEncoderCountenc0;
+    int encoderCountenc1 = enc1.getEncoderCount() - startEncoderCountenc1;
+    encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;            
   } 
    
   // Turn both left and right motors off
   qik.setMotorSpeed(Qik::Motor::M0, 0);
-  qik.setMotorSpeed(Qik::Motor::M1, 0);
+  qik.setMotorSpeed(Qik::Motor::M1, 0);*/
   
   /*
    *
@@ -169,13 +175,13 @@ int main(){
 }   
   
   
-  int totalCountsFor360WheelTurn = 1500;
+  int totalCountsFor360WheelTurn = 3300;
   int countChangeStepSize = 100;
   int wheelPower = 30;
   
   qik.setBrakePower(Qik::Motor::M0, 127);
   qik.setBrakePower(Qik::Motor::M1, 127); 
-  
+
   
   //Run forever.
   //The rosbee is expected to work as long as it has power.
@@ -184,7 +190,6 @@ int main(){
     //Get the command byte.
     //This will block if no byte is available.
     cmd = uart.readChar();
-    
     //Check which command to execute.
     //This is just a epic long switch case.
     //There was honestly no better way to do this that does
@@ -192,6 +197,15 @@ int main(){
     switch(cmd){
       //Debug
       //Commands regarding debugging.
+      case 'p':
+      print("pulseCount = %u\n", enc1.getEncoderCount());
+        break;
+      case 'l':
+      print("direction = %d\n", enc0.getDirection());
+        break;
+      case 'r':
+      print("direction = %d\n", enc1.getDirection());
+        break;
       case 'i':
       print("test\n");
         break;
@@ -223,24 +237,24 @@ int main(){
         break;
       case '[': {
         print("Starting M0 at %d for %d\n", wheelPower, totalCountsFor360WheelTurn);
-        int encoderCountEncStart = enc1.getEncoderCount();
-        //int currentLoops = enc1.getLoops();
+        int encoderCountEncStart = enc0.getEncoderCount();
+        //int currentLoops = enc0.getLoops();
         qik.setMotorSpeed(Qik::Motor::M0, wheelPower);
-        while (enc1.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
+        while (enc0.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
         }
-        //print("Loops: %d\n", enc1.getLoops() - currentLoops);   
+        //print("Loops: %d\n", enc0.getLoops() - currentLoops);   
         qik.setMotorSpeed(Qik::Motor::M0, 0); 
         qik.setBrakePower(Qik::Motor::M0,100);
         break;
       }        
       case ']': {
         print("Starting M1 at %d for %d\n", wheelPower, totalCountsFor360WheelTurn);
-        int encoderCountEncStart = enc2.getEncoderCount();
-       // int currentLoops = enc2.getLoops();
+        int encoderCountEncStart = enc1.getEncoderCount();
+       // int currentLoops = enc1.getLoops();
         qik.setMotorSpeed(Qik::Motor::M1, wheelPower);
-        while (enc2.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
+        while (enc1.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
         }   
-        //print("Loops: %d\n", enc2.getLoops() - currentLoops);  
+        //print("Loops: %d\n", enc1.getLoops() - currentLoops);  
         qik.setMotorSpeed(Qik::Motor::M1, 0); 
         qik.setBrakePower(Qik::Motor::M1,100);
         break;

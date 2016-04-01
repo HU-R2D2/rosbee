@@ -46,14 +46,16 @@
 /// To do this uninterrupted this class makes use of on of the Propeller cogs allocated with 192 bytes of memory.
 class Encoder{
 private:
-  int pin;
+  int pin1, pin2;
   unsigned int pulseCount;
   int speed;
+  int direction;
+  int oldDirection;
   // This is the minimum stack size required to for the cog (thread) to run.
   // Don't set it below 192.
-  char stack[192];  
+  char stack[250];  
   int cogId;
-  
+  int side;
   static void run(void* obj);
   
 public:
@@ -62,7 +64,7 @@ public:
   ///
   /// The contractor will start the pulse counting on a new cog. Make sure one or more cogs are available.
   /// @param newPin The pin on which the encoder is connected.
-  explicit Encoder(int newPin);
+  explicit Encoder(int newPin, int side);
   
   /// @brief Destroys this object freeing the cog.
   ~Encoder();
@@ -72,6 +74,8 @@ public:
   /// Get the amount of pulses counted since the creation of this object.
   /// @return The pulse count.
   unsigned int getEncoderCount();
+  int getDirection();
+  
   
   /// @brief Get pulse speed.
   ///

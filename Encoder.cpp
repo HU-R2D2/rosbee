@@ -38,13 +38,15 @@
 #include "Encoder.h"
 #include <simpletools.h>
 
-Encoder::Encoder(int newPin):
-pin{newPin}
+Encoder::Encoder(int newPin, int side):
+pin1{newPin}, 
+side{side}
 {
+     
   //Start execution of code on a new cog.
   //We can not directly call a member function.
   //So we pass the pointer of this object as the parameter to atchineve the same.
-  cogId = cogstart(&Encoder::run, this, stack,  sizeof(stack)); 
+  cogId = cogstart(&Encoder::run, this, stack,  sizeof(Encoder)); 
 }
 
 Encoder::~Encoder(){
@@ -56,6 +58,11 @@ unsigned int Encoder::getEncoderCount(){
   //Return the amount of counted pulses.
   return pulseCount; 
 }
+
+int Encoder::getDirection(){
+  //Return the amount of counted pulses.
+  return direction; 
+}
  
 int Encoder::getSpeed(){
   //Return the amount of counted pulses per second.
@@ -65,12 +72,21 @@ int Encoder::getSpeed(){
 void Encoder::run(void* obj){
   //Since we are sure the object is of type Encoder we can safely cast it back to a Encoder pointer. 
   Encoder* enc = reinterpret_cast<Encoder*>(obj);
+  enc->direction = -1;
   //Var we are using to hold the read dta.
-  int read;
+  if(enc->side == 0){
+     enc->pin2 = enc->pin1 + 1;
+  } 
+  else if(enc->side == 1){
+     enc->pin2 = enc->pin1 - 1;
+  }    
+  int readpin1, readpin2;
   //Var containt the data form last reading.
   //We use this to make a comparison the the new reading.
   //To make sure we have the correct start value we already make a reading here. 
-  int last = input(enc->pin);
+  int readlast1 = input(enc->pin1);
+  int readlast2 = input(enc->pin2);
+  enc->oldDirection = -1;
   //Var we use the count time.
   int count = 0;
   //Var we use the calculate the speed.
@@ -80,17 +96,33 @@ void Encoder::run(void* obj){
     //Read the state of the pin.
     //1 = endocer blocked
     //0 = encoder can see the led
-    read = input(enc->pin);
+    readpin1 = input(enc->pin1);
+    readpin2 = input(enc->pin2);
     //Read a downwards pulse.
     //Check if the encoder was blocked the last time we read.
     //Check if the encoder is not blocked now.
     //If so the motor has rotated and moved the encoder disk along with it.
-    if(last == 1 && read == 0){
-      //Add a pulse to the counter.
-      enc->pulseCount++;
+    if(readlast1 != readpin1 || readlast2 != readpin2){
+      enc->pulseCount++; 
     }
+    if((readlast1 && readlast2) || (!readlast1 && !readlast2)){
+      if(!readlast1 && readpin1){
+        enc->direction = 0;
+      } 
+      else if(!readlast2 && readpin2){
+        enc->direction = 1;
+      }               
+    }
+    else if(enc->direction != enc->oldDirection){
+      enc->pulseCount = 0;
+      enc->oldDirection = enc->direction;
+    }
+              
+          
+    readlast1 = readpin1;
+    readlast2 = readpin2;
     //Update the last pin state with the new.
-    last = read;
+    
     //Add 1 tick the the time counter.
     //This is equal to 2 ms.
     count++;
