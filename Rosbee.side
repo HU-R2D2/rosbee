@@ -1,0 +1,18 @@
+Rosbee.cpp
+Qik.cpp
+Qik.h
+Channel.h
+Encoder.cpp
+Encoder.h
+ParallaxPropellerProtocol.h
+Uart.cpp
+Uart.h
+>compiler=C++
+>memtype=lmm main ram
+>optimize=-Os
+>-m32bit-doubles
+>-fno-exceptions
+>-fno-rtti
+>defs::-std=gnu++0x
+>-ltiny
+>BOARD::QUICKSTART
