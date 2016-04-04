@@ -96,9 +96,8 @@ int main(){
   if (1) {
   // Sleep 5 seconds before starting test
   pause(5000);
-  
   // Using the encoder count of one specific Rosbee, might be different for others
-  int totalCounts360WheelTurn = 3300; // In encoder counts
+  int totalCounts360WheelTurn = 3000; // In encoder counts
   int wheelCircumference = 386; // In mm
   
   // Keep track of amount of encoder ticks
@@ -112,7 +111,7 @@ int main(){
   int motorPower = 30;
   
   // 3m forward
-  int distanceToGo = 386; // In mm
+  int distanceToGo = 4000; // In mm
   
   // Target encoder count
   float encoderCountTarget = totalCounts360WheelTurn * ((float)distanceToGo / wheelCircumference);
@@ -125,16 +124,31 @@ int main(){
   while(encoderCount < encoderCountTarget) {
     int encoderCountenc0 = enc0.getEncoderCount() - startEncoderCountenc0;
     int encoderCountenc1 = enc1.getEncoderCount() - startEncoderCountenc1;
+    
+    //if the speed of enc0 is less then enc1 the motor power needs to be a bit faster
+    if(enc0.getSpeed() < enc1.getSpeed()){
+        //drive a bit faster
+       qik.setMotorSpeed(Qik::Motor::M0, motorPower++);
+    }      
+    
+    //else if the speed of enc0 is more then enc1 the motor power needs to be a bit slower
+    else if(enc0.getSpeed() > enc1.getSpeed()){
+      //drive a bit slower
+       qik.setMotorSpeed(Qik::Motor::M0, motorPower--);
+    }
     encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;
-    print("enc1: %d and enc2: %d\n",  encoderCountenc0, encoderCountenc1);
-    pause(100);
+    //print("enc1: %d and enc2: %d\n",  enc0.getSpeed(), enc1.getSpeed());
+    pause(50);
   } 
   
   // Turn both left and right motors off
   qik.setMotorSpeed(Qik::Motor::M0, 0);
   qik.setMotorSpeed(Qik::Motor::M1, 0);
+  //brake as hard as possible
+  qik.setBrakePower(Qik::Motor::M0, 127);
+  qik.setBrakePower(Qik::Motor::M1, 127); 
   
-  /*pause(20000);
+  pause(5000);
   
   
   
@@ -165,7 +179,7 @@ int main(){
    
   // Turn both left and right motors off
   qik.setMotorSpeed(Qik::Motor::M0, 0);
-  qik.setMotorSpeed(Qik::Motor::M1, 0);*/
+  qik.setMotorSpeed(Qik::Motor::M1, 0);
   
   /*
    *

@@ -96,7 +96,9 @@ void Encoder::run(void* obj){
     //Read the state of the pin.
     //1 = endocer blocked
     //0 = encoder can see the led
+
     readpin1 = input(enc->pin1);
+
     readpin2 = input(enc->pin2);
     //Read a downwards pulse.
     //Check if the encoder was blocked the last time we read.
