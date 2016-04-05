@@ -73,6 +73,7 @@ void Encoder::run(void* obj){
   //Since we are sure the object is of type Encoder we can safely cast it back to a Encoder pointer. 
   Encoder* enc = reinterpret_cast<Encoder*>(obj);
   enc->direction = -1;
+  enc->oldDirection = -1;
   //Var we are using to hold the read dta.
   if(enc->side == 0){
      enc->pin2 = enc->pin1 + 1;
@@ -84,14 +85,16 @@ void Encoder::run(void* obj){
   //Var containt the data form last reading.
   //We use this to make a comparison the the new reading.
   //To make sure we have the correct start value we already make a reading here. 
-  int readlast1 = input(enc->pin1);
-  int readlast2 = input(enc->pin2);
-  enc->oldDirection = -1;
+  int readlast1 = input(enc->pin1);  
+  int readlast2 = input(enc->pin2);  
+  
   //Var we use the count time.
   int count = 0;
   //Var we use the calculate the speed.
   int lastSpeed = 0;
   //Start the reading, this will never end.
+  
+  int timer = 0;
   while(true){
     //Read the state of the pin.
     //1 = endocer blocked
@@ -119,7 +122,6 @@ void Encoder::run(void* obj){
       enc->pulseCount = 0;
       enc->oldDirection = enc->direction;
     }
-              
           
     readlast1 = readpin1;
     readlast2 = readpin2;
@@ -139,7 +141,19 @@ void Encoder::run(void* obj){
        enc->speed = (enc->pulseCount - lastSpeed);
        //Update the pulse count from a second ago with the current pulse count.
        lastSpeed = enc->pulseCount; 
-    }      
+    }
+    
+    //count times how long the encoder has speed ZERO
+    if (enc->speed == 0){
+      timer ++;   
+    }  else{
+      timer = 0; 
+    }  
+    // if encoder speed is ZERO for 250 milliseconds.
+    //pulseCount to Zero. 
+    if (timer >= 125){
+      enc->pulseCount = 0;  
+    }         
     //Wait 2000 microseconds aka 2 milliseconds.
     waitcnt(CNT + 20 * us);      
   }   

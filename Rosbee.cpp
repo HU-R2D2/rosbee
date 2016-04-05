@@ -71,7 +71,6 @@ int main(){
   //Encoder object for the left motor.
   int side = 0;
   Encoder enc0{leftWheel, side};
-  print("after encoder init \n");
   //Encoder object fot the right motor.
   side = 1;
   Encoder enc1{rightWheel, side};
@@ -88,7 +87,7 @@ int main(){
   signed char speed;
   
   
-  /*
+/*  
    *
    *  TEST CODE
    *
@@ -103,8 +102,6 @@ int main(){
   // Keep track of amount of encoder ticks
   int startEncoderCountenc0 = enc0.getEncoderCount();
   int startEncoderCountenc1 = enc1.getEncoderCount();
-  int enc0Count = 0;
-  int enc1Count = 0;
   int encoderCount = 0;
   
   // Motor power
@@ -122,9 +119,11 @@ int main(){
   
   // While robot hasn't reached the distanceToGo
   while(encoderCount < encoderCountTarget) {
+     print("encoderCount: %d\n", encoderCount);
     int encoderCountenc0 = enc0.getEncoderCount() - startEncoderCountenc0;
     int encoderCountenc1 = enc1.getEncoderCount() - startEncoderCountenc1;
-    
+
+    print("enc0: %d		enc1: %d\n", encoderCountenc0, encoderCountenc1);
     //if the speed of enc0 is less then enc1 the motor power needs to be a bit faster
     if(enc0.getSpeed() < enc1.getSpeed()){
         //drive a bit faster
@@ -137,7 +136,6 @@ int main(){
        qik.setMotorSpeed(Qik::Motor::M0, motorPower--);
     }
     encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;
-    //print("enc1: %d and enc2: %d\n",  enc0.getSpeed(), enc1.getSpeed());
     pause(50);
   } 
   
@@ -150,14 +148,8 @@ int main(){
   
   pause(5000);
   
-  
-  
-  // Sleep for 20 seconds to give us some time to measure 
-  //pause(20000);
-  
-  // Reset the start encoder count
-  startEncoderCountenc0 = enc0.getEncoderCount();
-  startEncoderCountenc1 = enc1.getEncoderCount();
+
+
   encoderCount = 0;
   
   // Distance for one circle of Rosbee
@@ -169,12 +161,17 @@ int main(){
   // Turn left and right motors on with an opposite motorPower so the robot will drive in a circle
   qik.setMotorSpeed(Qik::Motor::M0, motorPower);
   qik.setMotorSpeed(Qik::Motor::M1, -motorPower); 
-     
+  
+  // Reset the start encoder count
+  startEncoderCountenc0 = enc0.getEncoderCount();
+  startEncoderCountenc1 = enc1.getEncoderCount();
+  
+  print("rotate start===========\n");
   // While robot hasn't reached the distanceToGo   
   while(encoderCount < encoderCountTarget) {
-    int encoderCountenc0 = enc0.getEncoderCount() - startEncoderCountenc0;
+    int encoderCountenc0 = enc0.getEncoderCount()- startEncoderCountenc0;
     int encoderCountenc1 = enc1.getEncoderCount() - startEncoderCountenc1;
-    encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;            
+    encoderCount = (encoderCountenc0 + encoderCountenc1) / 2;         
   } 
    
   // Turn both left and right motors off
@@ -213,6 +210,9 @@ int main(){
       //Commands regarding debugging.
       case 'p':
       print("pulseCount = %u\n", enc1.getEncoderCount());
+        break;
+      case 's':
+      print("Speed = %u\n", enc1.getSpeed());
         break;
       case 'l':
       print("direction = %d\n", enc0.getDirection());
