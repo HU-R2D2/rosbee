@@ -37,9 +37,9 @@
 ////
 
 #include <simpletools.h>
-#include "Qik.h"
-#include "Encoder.h"
-#include "Uart.h"
+#include "../include/Qik.h"
+#include "../include/Encoder.h"
+#include "../include/Uart.h"
 
 /// Entry point of application.
 int main(){
@@ -97,23 +97,23 @@ int main(){
    *  TEST CODE
    *
   \*/
-
-  if (1) {
-  //Sleep 5 seconds before starting test
-  pause(5000);
-  
   //Encoder counts for 1 wheel turn for the rosbee. for another wheel needs other value. 
   int totalCounts360WheelTurn = 3000; // In encoder counts
   //circumference of the wheel of the rosbee in mm. 
   int wheelCircumference = 386; // In mm
+  //Motor power
+  int motorPower = 30;
+  if (1) {
+  //Sleep 5 seconds before starting test
+  pause(5000);
+  
+ 
   
   //Keep track of amount of encoder ticks
   int startEncoderCountenc0 = enc0.getEncoderCount();
   int startEncoderCountenc1 = enc1.getEncoderCount();
   int encoderCount = 0;
-  
-  //Motor power
-  int motorPower = 30;
+
   
   //4 meters forward
   int distanceToGo = 4000; // In mm
@@ -250,12 +250,12 @@ int main(){
         break;
         
       case '+': //Increase totalCountFor360WheelTurn.
-        totalCountsFor360WheelTurn = totalCountsFor360WheelTurn + countChangeStepSize;
-        print("Total: %d\n", totalCountsFor360WheelTurn);
+        totalCounts360WheelTurn = totalCounts360WheelTurn + countChangeStepSize;
+        print("Total: %d\n", totalCounts360WheelTurn);
         break;
       case '-': //Decrease totalCountFor360WheelTurn.
-        totalCountsFor360WheelTurn = totalCountsFor360WheelTurn - countChangeStepSize;
-        print("Total: %d\n", totalCountsFor360WheelTurn);
+        totalCounts360WheelTurn = totalCounts360WheelTurn - countChangeStepSize;
+        print("Total: %d\n", totalCounts360WheelTurn);
         break;
       case '*': //Multiply CountChangeStepSize by 10.
         countChangeStepSize = countChangeStepSize * 10;
@@ -269,20 +269,20 @@ int main(){
         print("Count change step size: %d\n", countChangeStepSize);          
         break;
       case '[': { //Start motor 0
-        print("Starting M0 at %d for %d\n", motorPower, totalCountsFor360WheelTurn);
+        print("Starting M0 at %d for %d\n", motorPower, totalCounts360WheelTurn);
         int encoderCountEncStart = enc0.getEncoderCount();
         qik.setMotorSpeed(Qik::Motor::M0, motorPower);
-        while (enc0.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
+        while (enc0.getEncoderCount() < (totalCounts360WheelTurn + encoderCountEncStart)) {
         }  
         qik.setMotorSpeed(Qik::Motor::M0, 0); 
         qik.setBrakePower(Qik::Motor::M0,100);
         break;
       }        
       case ']': { //Start motor 1
-        print("Starting M1 at %d for %d\n", motorPower, totalCountsFor360WheelTurn);
+        print("Starting M1 at %d for %d\n", motorPower, totalCounts360WheelTurn);
         int encoderCountEncStart = enc1.getEncoderCount();
         qik.setMotorSpeed(Qik::Motor::M1, motorPower);
-        while (enc1.getEncoderCount() < (totalCountsFor360WheelTurn + encoderCountEncStart)) {
+        while (enc1.getEncoderCount() < (totalCounts360WheelTurn + encoderCountEncStart)) {
         }     
         qik.setMotorSpeed(Qik::Motor::M1, 0); 
         qik.setBrakePower(Qik::Motor::M1,100);

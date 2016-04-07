@@ -35,9 +35,9 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "Uart.h"
+#include "../include/Uart.h"
 #include <simpletools.h>
-#include "Channel.h"
+#include "../include/Channel.h"
 
 Uart::Uart(){
   //Claim a cog.

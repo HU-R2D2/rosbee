@@ -36,7 +36,7 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////
 
-#include "Encoder.h"
+#include "../include/Encoder.h"
 #include <simpletools.h>
 
 Encoder::Encoder(int newPin, int side):
