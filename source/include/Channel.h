@@ -6,13 +6,13 @@
 * /_/  \____/_.___/\____/_/   \___/____/\___/\__,_/\___/
 *
 *
-* @file Channel.h
-* @date Created: 16-4-2015
-* @version 1.0
+* \file Channel.h
+* \date Created: 16-4-2015
+* \version 1.0
 *
-* @author Nathan Schaaphuizen
+* \author Nathan Schaaphuizen, Robert Zegers
 *
-* @section LICENSE
+* \section LICENSE
 * License: newBSD
 *
 * Copyright © 2015, HU University of Applied Sciences Utrecht.
@@ -38,7 +38,7 @@
 #ifndef _CHANNEL_H
 #define _CHANNEL_H
 
-/// @brief Class for passing data synchronously between cogs.
+/// \brief Class for passing data synchronously between cogs.
 ///
 /// The Channel is a class to pass data synchronously between cogs.
 /// It has a fixed size. The channel makes use of the FIFO principle.
@@ -50,44 +50,44 @@ private:
     unsigned int pulseCount;
 public:
 
-    /// @brief Creates new channel object.
-    Channel():
-      index{0}
+    /// \brief Creates new channel object.
+	Channel():
+		index{0}
     {}
     
-    /// @brief Write data in channel.
+    /// \brief Write data in channel.
     ///
     /// This function will block if channel is  full.
     void write(T t) volatile{
-      //Spinlock the cog if channel is full.
-      //We can't write in a full channel.
-      while(index >= S);
-      //Write new data in buffer and up the buffer index.   
-      buffer[index++] = t;
+		//Spinlock the cog if channel is full.
+		//We can't write in a full channel.
+		while(index >= S);
+		//Write new data in buffer and up the buffer index.   
+		buffer[index++] = t;
     }
 
   
-    /// @brief Read data from the channel.
+    /// \brief Read data from the channel.
     ///
     /// This function will block if channel is empty.
     T read() volatile{
-      //Spinlock the cog if channel is empty.
-      //we can't read from a empty channel.
-      while(index <= 0);
-      //Temporary item that we're going to return later.
-      T tmp = buffer[0];
-      //Lower the buffer index.
-      index--;
-      //Copy all data one to the left.
-      //This array will go out of bounds. 
-      //But that's ok, it will fill the channel with we junk data
-      //that will be overwritten by the next write().
-      for(int i=0;i<S;++i){
-        //Copy one component to the left.
-        buffer[i] = buffer[i+1];  
-      }      
-      //Return the item we saved before. 
-      return tmp;  
+		//Spinlock the cog if channel is empty.
+		//we can't read from a empty channel.
+		while(index <= 0);
+		//Temporary item that we're going to return later.
+		T tmp = buffer[0];
+		//Lower the buffer index.
+		index--;
+		//Copy all data one to the left.
+		//This array will go out of bounds. 
+		//But that's ok, it will fill the channel with we junk data
+		//that will be overwritten by the next write().
+		for(int i=0;i<S;++i){
+			//Copy one component to the left.
+			buffer[i] = buffer[i+1];  
+		}      
+		//Return the item we saved before. 
+		return tmp;  
     } 
 
 };

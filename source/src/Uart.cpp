@@ -10,7 +10,7 @@
 * @date Created: 13-5-2015
 * @version 1.1
 *
-* @author Nathan Schaaphuizen
+* @author Nathan Schaaphuizen, Robert Zegers
 *
 * @section LICENSE
 * License: newBSD
@@ -40,58 +40,58 @@
 #include "../include/Channel.h"
 
 Uart::Uart(){
-  //Claim a cog.
-  cogId = cogstart(&Uart::readBuffer, this, stack,  sizeof(stack)); 
+	//Claim a cog.
+	cogId = cogstart(&Uart::readBuffer, this, stack,  sizeof(Uart)); 
 }  
 
 Uart::~Uart(){
-  //Free the cog.
-  cogstop(cogId); 
+	//Free the cog.
+	cogstop(cogId); 
 }
 
 void Uart::readBuffer(void* obj){
-  //Convert the obj to a Uart object.
-  //Since the obj was originally a Uart obj this is legal.
-  Uart* enc = reinterpret_cast<Uart*>(obj);
-  //Run forever
-  while(true){
-    //Read the next incoming character and put it in the buffer.
-    //getchar() will block if there is nothing to read.
-    enc->readChannel.write(getchar());
-  }     
+	//Convert the obj to a Uart object.
+	//Since the obj was originally a Uart obj this is legal.
+	Uart* enc = reinterpret_cast<Uart*>(obj);
+	//Run forever
+	while(true){
+		//Read the next incoming character and put it in the buffer.
+		//getchar() will block if there is nothing to read.
+		enc->readChannel.write(getchar());
+	}     
 }
 
 char Uart::readChar(){
-  //Read and return the next character from the buffer.
-  return readChannel.read();  
+	//Read and return the next character from the buffer.
+	return readChannel.read();  
 }   
   
 int Uart::readInt(){
-  //The four character we're going to read and convert into a int.
-  char intChar[4];
-  //Read the four characters.
-  for(int i =0; i<4; ++i){
-     intChar[i] = readChannel.read();  
-  }    
-  //Cast the four read chars to a int.
-  //This is faster and easier than bit shifting.
-  int data = *(reinterpret_cast<int*>(intChar));
-  //Return the int.
-  return data;   
+	//The four character we're going to read and convert into a int.
+	char intChar[4];
+	//Read the four characters.
+	for(int i =0; i<4; ++i){
+		intChar[i] = readChannel.read();  
+	}    
+	//Cast the four read chars to an int.
+	//This is faster and easier than bit shifting.
+	int data = *(reinterpret_cast<int*>(intChar));
+	//Return the int.
+	return data;   
 }
 
- void Uart::send(char data){
-  //Send the character.
-  putChar(data);
- }   
+void Uart::send(char data){
+	//Send the character.
+	putChar(data);
+}   
   
- void Uart::send(int data){
-  //Cast the int to four chars.
-  //This is faster and easier the bit shifting and copying.
-  char *intChar = reinterpret_cast<char*>(&data);
-  //Send all four bytes.
-  for(int i =0; i<4; ++i){
-     putChar(intChar[i]); 
-  }
- }
+void Uart::send(int data){
+	//Cast the int to four chars.
+	//This is faster and easier the bit shifting and copying.
+	char *intChar = reinterpret_cast<char*>(&data);
+	//Send all four bytes.
+	for(int i =0; i<4; ++i){
+		putChar(intChar[i]); 
+	}
+}
       

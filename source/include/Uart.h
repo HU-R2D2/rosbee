@@ -6,13 +6,13 @@
 * /_/  \____/_.___/\____/_/   \___/____/\___/\__,_/\___/
 *
 *
-* @file Uart.h
-* @date Created: 13-5-2015
-* @version 1.0
+* \file Uart.h
+* \date Created: 13-5-2015
+* \version 1.0
 *
-* @author Nathan Schaaphuizen
+* \author Nathan Schaaphuizen
 *
-* @section LICENSE
+* \section LICENSE
 * License: newBSD
 *
 * Copyright © 2015, HU University of Applied Sciences Utrecht.
@@ -41,62 +41,64 @@
 #include <simpletools.h>
 #include "../include/Channel.h"
 
-/// @brief Class for communication between propeller and pc (or PI).
+/// \brief Class for communication between propeller and pc (or PI).
 ///
 /// The Uart class is a half buffer full duplex communication class.
 /// It makes use of the UART protocol to send data over the debug port to a
-/// attached computer. The UART specifications are (8-n-1) at a baud of 115200 bps. 
+/// attached computer. 
+/// The UART specifications are (8-n-1) at a baud of 115200 bps. 
 /// All incoming data is buffered up to 128 bytes. All data after that is lost.
 /// All outgoing data is not buffered but send directly.
 /// Note that all data is written and read in a binary format.
 /// Note this class makes use of a cog.
 class Uart{
-private:
-  // Read buffer size of 128 chars.
-  Channel<char,128> readChannel;
-  // This is the minimum stack size required to for the cog (thread) to run.
-  // Don't set it below 192.
-  char stack[192]; 
-  int cogId;
+	private:
+		// Read buffer size of 128 chars.
+		Channel<char,128> readChannel;
+		// This is the minimum stack size 
+		// required to for the cog (thread) to run.
+		// Don't set it below 192.
+		char stack[192]; 
+		int cogId;
 
-  static void readBuffer(void*);
-  
-public:
-  /// @brief Creates a Uart object.
-  ///
-  /// Initializes a free cog for use. 
-  Uart();
-  
-  /// @brief Destroys  the Uart object.
-  ///
-  /// Frees the used cog.
-  ~Uart();
-  
-  /// @brief Read a character.
-  ///
-  /// Read one character from the buffer.
-  /// @return Next character in buffer.
-  char readChar();
-  
-  /// @brief Read a integer.
-  ///
-  /// Read the next four characters from the buffer and 
-  /// converts these to a integer.
-  /// @return Next integer in buffer.
-  int readInt();
-  
-  /// @brief Send a character.
-  ///
-  /// Directly sends a character.
-  /// @param data The character to be sent.
-  void send(char data);
-  
-  /// @brief Send a integer.
-  ///
-  /// Converts an integer to four characters and directly sends these.
-  /// @param data The integer to be sent.
-  void send(int data);
-    
+		static void readBuffer(void*);
+	  
+	public:
+		/// \brief Creates a Uart object.
+		///
+		/// Initializes a free cog for use. 
+		Uart();
+		
+		/// \brief Destroys  the Uart object.
+		///
+		/// Frees the used cog.
+		~Uart();
+	  
+		/// \brief Read a character.
+		///
+		/// Read one character from the buffer.
+		/// \return Next character in buffer.
+		char readChar();
+	  
+		/// \brief Read a integer.
+		///
+		/// Read the next four characters from the buffer and 
+		/// converts these to a integer.
+		/// \return Next integer in buffer.
+		int readInt();
+	  
+		/// \brief Send a character.
+		///
+		/// Directly sends a character.
+		/// \param data The character to be sent.
+		void send(char data);
+	  
+		/// \brief Send a integer.
+		///
+		/// Converts an integer to four characters and directly sends these.
+		/// \param data The integer to be sent.
+		void send(int data);
+		
 };  
 
 #endif // _UART_H
