@@ -35,7 +35,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "Qik.h"
+#include "../include/Qik.h"
 #include <simpletools.h> 
 
 Qik::Qik(int pinTx, int pinRx, int baudRate):

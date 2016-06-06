@@ -39,7 +39,7 @@
 #define _UART_H
 
 #include <simpletools.h>
-#include "Channel.h"
+#include "../include/Channel.h"
 
 /// @brief Class for communication between propeller and pc (or PI).
 ///
